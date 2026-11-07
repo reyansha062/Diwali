@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Happy Diwali</title>
+<style>
+:root{--bg1:#8c1c13;--bg2:#3a0707;--gold:#ffd166;--marigold:#ff9f1c;--text:#fff1d0;color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:radial-gradient(circle at 50% 45%,var(--bg1),var(--bg2) 80%);color:var(--text);font-family:Georgia,"Times New Roman",serif;overflow:hidden;text-align:center}
+#mandala{position:fixed;left:50%;top:50%;width:min(130vmin,900px);height:min(130vmin,900px);margin:calc(min(130vmin,900px)/-2) 0 0 calc(min(130vmin,900px)/-2);opacity:.28;animation:spin 90s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.lanterns{position:fixed;top:0;left:0;right:0;display:flex;justify-content:space-around;pointer-events:none;z-index:2}
+.lan{transform-origin:top center;animation:sway 3.5s ease-in-out infinite alternate}
+.lan:nth-child(2n){animation-delay:-1.5s}
+.lan:nth-child(3n){animation-delay:-.8s}
+@keyframes sway{from{transform:rotate(-6deg)}to{transform:rotate(6deg)}}
+.lan i{display:block;width:2px;background:var(--gold);margin:0 auto}
+.lan b{display:block;width:34px;height:46px;margin:0 auto;border-radius:12px 12px 16px 16px;background:linear-gradient(#ffb347,#e63946);box-shadow:0 0 24px 6px rgba(255,159,28,.55),inset 0 0 0 2px var(--gold)}
+main{position:relative;z-index:1;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:16px}
+.deva{font-size:clamp(1.3rem,5vw,2rem);color:var(--marigold);letter-spacing:.1em;margin:0}
+h1{margin:0;font-weight:normal;font-style:italic;font-size:clamp(3rem,13vw,7rem);line-height:1;background:linear-gradient(180deg,#fff3b0,var(--gold) 50%,var(--marigold));-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 4px 14px rgba(0,0,0,.5))}
+.orn{width:min(70vw,360px);height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:6px 0}
+#wish{font-size:clamp(1.1rem,3.8vw,1.7rem);max-width:28ch;min-height:3.2em;margin:0;transition:opacity .8s}
+.diyas{display:flex;gap:clamp(12px,4vw,34px);margin-top:12px}
+.diya{position:relative;width:46px;height:22px;background:linear-gradient(#f4a259,#8a3b12);border-radius:0 0 46px 46px/0 0 22px 22px}
+.diya::before{content:"";position:absolute;left:50%;top:-20px;width:12px;height:22px;margin-left:-6px;background:radial-gradient(ellipse at 50% 75%,#fffbe0,var(--gold) 45%,var(--marigold) 75%,transparent 76%);border-radius:50%/65% 65% 35% 35%;box-shadow:0 0 22px 8px rgba(255,159,28,.65);animation:flick .5s ease-in-out infinite alternate}
+.diya:nth-child(2n)::before{animation-delay:.25s}
+@keyframes flick{from{transform:scale(1) rotate(-3deg)}to{transform:scale(1.12,1.2) rotate(3deg)}}
+.petal{position:fixed;top:-30px;z-index:3;pointer-events:none;border-radius:60% 0 60% 0;animation:fall linear forwards}
+@keyframes fall{to{transform:translate(var(--dx),110vh) rotate(var(--rot))}}
+small{opacity:.65;margin-top:6px}
+#fx{position:fixed;inset:0;width:100%;height:100%;z-index:1;pointer-events:none}
+.troll{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:8px}
+.troll button{font:inherit;font-size:1rem;padding:10px 18px;border-radius:999px;border:0;cursor:pointer;font-weight:bold;background:linear-gradient(135deg,var(--gold),var(--marigold));color:#3a0707;transition:left .25s,top .25s}
+#bomb{background:linear-gradient(135deg,#ff4d6d,#c1121f);color:#fff}
+#tmsg{min-height:1.6em;margin:4px 0 0;font-size:clamp(1rem,3.5vw,1.3rem);color:var(--gold);max-width:30ch}
+</style>
+</head>
+<body>
+<svg id="mandala" viewBox="-100 -100 200 200" fill="none" stroke="#ffd166" stroke-width=".6" aria-hidden="true">
+  <g id="ring"></g>
+</svg>
+<canvas id="fx"></canvas>
+<div class="lanterns" id="lan"></div>
+<main>
+  <p class="deva">शुभ दीपावली</p>
+  <h1>Happy Diwali</h1>
+  <div class="orn"></div>
+  <p id="wish"></p>
+  <div class="diyas"><div class="diya"></div><div class="diya"></div><div class="diya"></div><div class="diya"></div><div class="diya"></div></div>
+  <div class="troll"><button id="bonus">🎁 Claim your Diwali bonus</button><button id="bomb">🧨 Don’t press this</button></div>
+  <p id="tmsg"></p>
+  <small>Tap anywhere to launch rockets 🚀</small>
+</main>
+<script>
+// Mandala
+const ring=document.getElementById('ring');let m='';
+for(let r of [92,76,60,44,28]){
+  const n=r>60?24:16;
+  for(let i=0;i<n;i++){m+=`<ellipse cx="0" cy="${-r}" rx="${r/9}" ry="${r/4}" transform="rotate(${i*360/n})"/>`}
+  m+=`<circle r="${r}"/>`;
+}
+ring.innerHTML=m;
+// Lanterns
+const lan=document.getElementById('lan');
+[40,90,55,110,45,85,60].forEach(h=>{lan.insertAdjacentHTML('beforeend',`<div class="lan"><i style="height:${h}px"></i><b></b></div>`)});
+// Rotating wishes
+const wishes=[
+ 'May the festival of lights fill your life with joy and prosperity.',
+ 'May every diya bring you happiness, health and good fortune.',
+ 'May light always triumph over darkness in your life.',
+ 'Wishing you and your family a sparkling, sweet Diwali!',
+ 'May Goddess Lakshmi bless your home with peace and abundance.'
+];
+const w=document.getElementById('wish');let k=0;
+function show(){w.style.opacity=0;setTimeout(()=>{w.textContent=wishes[k++%wishes.length];w.style.opacity=1},800)}
+w.textContent=wishes[k++];setInterval(show,4500);
+// Petals
+const pc=['#ff9f1c','#ffbf00','#ff7b00','#e63946','#ffd166'];
+function petal(x,y){
+  const p=document.createElement('div');p.className='petal';
+  const s=8+Math.random()*10;
+  p.style.cssText=`left:${x}px;top:${y}px;width:${s}px;height:${s}px;background:${pc[Math.floor(Math.random()*pc.length)]};--dx:${(Math.random()-.5)*200}px;--rot:${Math.random()*720}deg;animation-duration:${4+Math.random()*4}s`;
+  document.body.appendChild(p);setTimeout(()=>p.remove(),8500);
+}
+setInterval(()=>petal(Math.random()*innerWidth,-20),350);
+addEventListener('pointerdown',e=>{for(let i=0;i<24;i++)petal(e.clientX+(Math.random()-.5)*60,e.clientY-20)});
+// Firecrackers: rockets, anaar fountains, chakri wheels
+const c=document.getElementById('fx'),g=c.getContext('2d');let W,H;
+function rs(){W=c.width=innerWidth;H=c.height=innerHeight}addEventListener('resize',rs);rs();
+const cl=['#ffd166','#ff9f1c','#ff4d6d','#7df9ff','#c77dff','#80ed99','#ffffff'];
+let sp=[],rk=[],ac=null;
+function spark(x,y,vx,vy,col,life,gr,tw){sp.push({x,y,vx,vy,col,l:life,m:life,g:gr==null?.06:gr,tw})}
+function bang(v){if(!ac)return;const n=ac.sampleRate*.35,b=ac.createBuffer(1,n,ac.sampleRate),d=b.getChannelData(0);
+ for(let i=0;i<n;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/n,3);
+ const s=ac.createBufferSource(),gn=ac.createGain();s.buffer=b;gn.gain.value=v;s.connect(gn).connect(ac.destination);s.start()}
+function explode(x,y){
+ const a1=cl[Math.random()*cl.length|0],a2=cl[Math.random()*cl.length|0];
+ for(let i=0;i<220;i++){const a=Math.random()*6.283,s=Math.random()*7+1;spark(x,y,Math.cos(a)*s,Math.sin(a)*s,i%3?a1:a2,70+Math.random()*40)}for(let i=0;i<60;i++){const a=i/60*6.283;spark(x,y,Math.cos(a)*8,Math.sin(a)*8,'#fff',45,.02)}
+ for(let i=0;i<30;i++){const a=Math.random()*6.283,s=Math.random()*2.5;spark(x,y,Math.cos(a)*s,Math.sin(a)*s,'#fff',70+Math.random()*40,.03,true)}
+ bang(.9);flash=.35;shake=10;
+}
+function launch(x,ty){rk.push({x,y:H,ty,vy:-(9+Math.random()*3),vx:(Math.random()-.5)*.8})}
+setInterval(()=>launch(W*(.1+Math.random()*.8),H*(.12+Math.random()*.35)),800);
+let ang=0,flash=0,shake=0;
+function frame(){
+ g.globalCompositeOperation='destination-out';g.fillStyle='rgba(0,0,0,.25)';g.fillRect(0,0,W,H);
+ g.globalCompositeOperation='lighter';
+ for(const r of rk){r.x+=r.vx;r.y+=r.vy;r.vy*=.99;spark(r.x,r.y,(Math.random()-.5)*.6,Math.random()*1.2,'#ffb347',18,.02);
+  if(r.y<=r.ty||r.vy>-1.5){r.dead=1;explode(r.x,r.y)}}
+ rk=rk.filter(r=>!r.dead);
+ // anaar fountains
+ for(const fx of [W*.1,W*.9])for(let i=0;i<5;i++)spark(fx,H-6,(Math.random()-.5)*2.6,-(6+Math.random()*5),Math.random()<.5?'#ffd166':'#ff9f1c',40+Math.random()*25,.14);
+ // chakri wheels
+ ang+=.4;
+ for(const cx of [W*.28,W*.72])for(let k=0;k<3;k++){const a=ang+k*2.094;spark(cx+Math.cos(a)*10,H-26+Math.sin(a)*10,Math.cos(a+1.57)*3.2,Math.sin(a+1.57)*3.2-.5,k%2?'#7df9ff':'#ffd166',24,.05)}
+ sp=sp.filter(p=>p.l>0);
+ for(const p of sp){p.x+=p.vx;p.y+=p.vy;p.vy+=p.g;p.vx*=.985;p.l--;
+  g.globalAlpha=Math.max(0,p.l/p.m)*(p.tw?(Math.random()<.5?1:.1):1);g.fillStyle=p.col;g.fillRect(p.x,p.y,2.4,2.4)}
+ g.globalAlpha=1;
+ if(flash>.01){g.fillStyle='rgba(255,220,150,'+flash+')';g.fillRect(0,0,W,H);flash*=.85}
+ const mn=document.querySelector('main');
+ if(shake>.5){mn.style.transform='translate('+((Math.random()-.5)*shake)+'px,'+((Math.random()-.5)*shake)+'px)';shake*=.85}else if(mn.style.transform){mn.style.transform=''}
+ requestAnimationFrame(frame);
+}
+frame();
+addEventListener('pointerdown',e=>{
+ if(!ac){try{ac=new (window.AudioContext||window.webkitAudioContext)()}catch(_){}}
+ launch(e.clientX,e.clientY);launch(e.clientX-60,e.clientY+40);launch(e.clientX+60,e.clientY+40);
+});
+// Trolling
+function finale(){for(let i=0;i<14;i++)setTimeout(()=>launch(W*(.08+Math.random()*.84),H*(.1+Math.random()*.4)),i*180);explode(W/2,H*.35)}
+const tm=document.getElementById('tmsg'),bonus=document.getElementById('bonus'),bomb=document.getElementById('bomb');
+const taunts=['Too slow! 😜','Almost… 😏','Nice try! 🏃','Your finger needs more mithai 🍬','Is your phone lagging or is it you? 😂','Okay okay, one more try…'];
+let dodges=0;
+function dodge(e){
+ if(dodges>=6)return;
+ e.stopPropagation();e.preventDefault();
+ tm.textContent=taunts[dodges];dodges++;
+ bonus.style.position='fixed';bonus.style.zIndex=5;
+ const bw=bonus.offsetWidth,bh=bonus.offsetHeight;
+ bonus.style.left=Math.max(8,Math.random()*(innerWidth-bw-16))+'px';
+ bonus.style.top=Math.max(8,Math.random()*(innerHeight-bh-16))+'px';
+}
+bonus.addEventListener('pointerenter',dodge);
+bonus.addEventListener('pointerdown',dodge);
+bonus.addEventListener('click',e=>{
+ e.stopPropagation();
+ if(dodges<6){dodge(e);return}
+ tm.textContent='Bonus claimed: ₹0 + unlimited wishes + mithai from YOU 🍬 Happy Diwali!';
+ bonus.style.display='none';finale();
+});
+bomb.addEventListener('pointerdown',e=>e.stopPropagation());
+bomb.addEventListener('click',()=>{
+ bomb.disabled=true;let n=3;tm.textContent='💣 Exploding in 3…';shake=6;
+ const t=setInterval(()=>{n--;if(n>0){tm.textContent='💣 Exploding in '+n+'…';shake=8}else{clearInterval(t);
+  tm.textContent='…phuss. 💨 (Dud cracker!)';
+  for(let i=0;i<8;i++)spark(bomb.getBoundingClientRect().left+40,bomb.getBoundingClientRect().top,(Math.random()-.5)*2,-Math.random()*2,'#ccc',20,.05);
+  setTimeout(()=>{tm.textContent='Gotcha! 😂 Happy Diwali! 🪔';finale();bomb.disabled=false},1800)}},900);
+});
+</script>
+</body>
+</html>
